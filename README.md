@@ -3,7 +3,7 @@
 ## ❓ INFO ❓
 
 This plugin provides a more readable history for asset/user relations.
-Once installed and activated the plugin hooks into asset updates and stores every user-relation change separately.
+Once installed and activated the plugin hooks (with database triggers due to missing glpi-hook support on inventory updates) into asset updates and stores every user-relation change separately.
 
 **Currently supported asset types:**
 
