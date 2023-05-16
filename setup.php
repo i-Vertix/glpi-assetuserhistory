@@ -59,26 +59,6 @@ function plugin_init_assetuserhistory(): void
             'addtabon' => ['User', 'Computer', 'Monitor', 'NetworkEquipment', 'Peripheral', 'Phone', 'Printer'],
         ]);
 
-        // FIRE PRE ITEM UPDATE FUNCTION TO UPDATE HISTORY WHEN ASSET OF FOLLOWING TYPES IS UPDATED
-        $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['assetuserhistory'] = [
-            'Computer' => 'plugin_assetuserhistory_pre_item_update_asset',
-            'Monitor' => 'plugin_assetuserhistory_pre_item_update_asset',
-            'NetworkEquipment' => 'plugin_assetuserhistory_pre_item_update_asset',
-            'Peripheral' => 'plugin_assetuserhistory_pre_item_update_asset',
-            'Phone' => 'plugin_assetuserhistory_pre_item_update_asset',
-            'Printer' => 'plugin_assetuserhistory_pre_item_update_asset',
-        ];
-
-        // FIRE ON ADD FUNCTION TO INSERT HISTORY WHEN ASSET OF FOLLOWING TYPES IS ADDED
-        $PLUGIN_HOOKS[Hooks::ITEM_ADD]['assetuserhistory'] = [
-            'Computer' => 'plugin_assetuserhistory_item_add_asset',
-            'Monitor' => 'plugin_assetuserhistory_item_add_asset',
-            'NetworkEquipment' => 'plugin_assetuserhistory_item_add_asset',
-            'Peripheral' => 'plugin_assetuserhistory_item_add_asset',
-            'Phone' => 'plugin_assetuserhistory_item_add_asset',
-            'Printer' => 'plugin_assetuserhistory_item_add_asset',
-        ];
-
         // FIRE ON DELETE FUNCTION (PERMANENTLY) TO DELETE HISTORY WHEN ASSET OF FOLLOWING TYPES IS DELETED
         $PLUGIN_HOOKS[Hooks::ITEM_PURGE]['assetuserhistory'] = [
             'Computer' => 'plugin_assetuserhistory_item_purge_asset',

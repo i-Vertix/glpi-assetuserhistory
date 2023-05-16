@@ -45,15 +45,70 @@ function plugin_assetuserhistory_install(): bool
     // COMPUTER
     if (!$DB->tableExists("glpi_plugin_assetuserhistory_history")) {
         $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_assetuserhistory_history` (
-            `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `users_id` int(11) UNSIGNED NOT NULL,
-            `assets_id` int(11) UNSIGNED NOT NULL,
-            `assets_type` varchar(255) NOT NULL,
-            `assigned` timestamp NULL,
-            `revoked` timestamp NULL,
-            PRIMARY KEY (`id`)
-          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+            `id` int unsigned not null primary key auto_increment,
+            `users_id` int unsigned not null ,
+            `assets_id` int unsigned not null ,
+            `assets_type` varchar(255) not null ,
+            `assigned` timestamp null,
+            `revoked` timestamp null
+          )";
         $DB->queryOrDie($query, "table glpi_plugin_assetuserhistory_history created");
+    }
+
+    // WITHOUT STRICT_TRANS_TABLES TRIGGERS DO NOT WORK CORRECTLY
+    $DB->query("SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION'");
+
+    $tablesForTriggers = [
+        ["glpi_computers", "Computer"],
+        ["glpi_monitors", "Monitor"],
+        ["glpi_networkequipments", "NetworkEquipment"],
+        ["glpi_peripherals", "Peripheral"],
+        ["glpi_phones", "Phone"],
+        ["glpi_printers", "Printer"],
+    ];
+
+    foreach ($tablesForTriggers as [$table, $type]) {
+        $name = strtolower($type);
+
+        $DB->queryOrDie("
+create or replace trigger plugin_assetuserhistory_". $name. "_add
+    after insert
+    on " . $table . "
+    for each row
+begin
+    DECLARE aType varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+    SET aType = '" . $type . "';
+    if (NEW.users_id <> 0 and NEW.users_id is not null and NEW.users_id is not null) then
+        insert into glpi_plugin_assetuserhistory_history (users_id, assets_id, assets_type, assigned)
+        values (NEW.users_id, NEW.id, aType, NOW());
+    end if;
+end;
+");
+
+        $DB->queryOrDie("
+create or replace trigger plugin_assetuserhistory_" . $name . "_update
+    after update
+    on " . $table . "
+    for each row
+begin
+    DECLARE assets_type varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+    SET assets_type = '" . $type . "';
+    if (NEW.users_id <> OLD.users_id) then
+    
+        update glpi_plugin_assetuserhistory_history
+        set revoked = NOW()
+        where users_id = OLD.users_id
+        and assets_id = NEW.id
+        and assets_type = assets_type
+        and revoked is null;
+
+        if (NEW.users_id <> 0) then
+            insert into glpi_plugin_assetuserhistory_history (users_id, assets_id, assets_type, assigned)
+            values (NEW.users_id, NEW.id, assets_type, NOW());
+        end if;
+    end if;
+end;
+");
     }
 
     $migration->executeMigration();
@@ -76,71 +131,22 @@ function plugin_assetuserhistory_uninstall(): bool
         $DB->queryOrDie($query, "table glpi_plugin_assetuserhistory_history deleted");
     }
 
+    $triggerNames = [
+        "computer",
+        "monitor",
+        "networkequipment",
+        "peripheral",
+        "phone",
+        "printer",
+    ];
+
+    foreach ($triggerNames as $name) {
+        $DB->queryOrDie("drop trigger if exists plugin_assetuserhistory_" . $name . "_add;");
+        $DB->queryOrDie("drop trigger if exists plugin_assetuserhistory_" . $name . "_update;");
+    }
+
+
     return true;
-}
-
-/**
- * @param CommonDBTM $item
- * @return void
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_pre_item_update_asset(CommonDBTM $item): void
-{
-    // WHEN ASSET HAS NO FIELD "USERS_ID" -> RETURN
-    if (!isset($item->fields['users_id'], $item->fields['entities_id'])) return;
-    // IF USER ID NOT SET, INPUT VALUE IS 0
-    $usersId = (int)$item->input['users_id'];
-    $assetsId = $item->fields['id'];
-    $assetsType = $item::getType();
-
-    global $DB;
-    $oldUsersId = $item->fields['users_id'];
-
-    // NO CHANGE - RETURN
-    if ($oldUsersId === $usersId) return;
-
-    // UPDATE OLD HISTORY ENTRY (REVOKED UNSET) IF EXISTS
-    if ($oldUsersId) {
-        $stmt = $DB->prepare("update glpi_plugin_assetuserhistory_history set 
-                    revoked = NOW() where users_id = ? and assets_id = ? 
-                                                    and assets_type = ? and revoked is null");
-        $stmt->bind_param("iis", $oldUsersId, $assetsId, $assetsType);
-        $stmt->execute();
-    }
-
-    // ADD NEW HISTORY ENTRY FOR NEWLY ASSIGNED USER ID
-    if ($usersId) {
-        $stmt = $DB->prepare("insert into glpi_plugin_assetuserhistory_history (users_id, assets_id, assets_type, assigned)
-                                        values (?, ?, ?, NOW())");
-        $stmt->bind_param("iis", $usersId, $assetsId, $assetsType);
-        $stmt->execute();
-    }
-}
-
-/**
- * @param CommonDBTM $item
- * @return void
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_item_add_asset(CommonDBTM $item): void
-{
-    // WHEN ASSET HAS NO FIELD "USERS_ID" -> RETURN
-    if (!isset($item->fields['users_id'])) return;
-    $usersId = (int)$item->input['users_id'];
-    // IF USER ID NOT SET, INPUT VALUE IS 0
-    // NO USER ASSIGNED -> NO HISTORY TO WRITE -> RETURN
-    if ($usersId === 0) return;
-
-    $assetsId = $item->fields['id'];
-    $assetsType = $item::getType();
-
-    global $DB;
-
-    // ADD NEW HISTORY ENTRY FOR ASSIGNED USER ID
-    $stmt = $DB->prepare("insert into glpi_plugin_assetuserhistory_history (users_id, assets_id, assets_type, assigned)
-                                        values (?, ?, ?, NOW())");
-    $stmt->bind_param("iis", $usersId, $assetsId, $assetsType);
-    $stmt->execute();
 }
 
 /**
