@@ -1,0 +1,53 @@
+<root>
+   <name>Asset-User History</name>
+   <key>assetuserhistory</key>
+   <state>stable</state>
+   <logo>https://raw.githubusercontent.com/pluginsGLPI/assetusers/master/{LNAME}.png</logo>
+   <description>
+      <short>
+         <en>Asset-User History plugin for GLPI</en>
+         <de>Asset-User History plugin für GLPI</de>
+         <it>Asset-User History plugin per GLPI</it>
+      </short>
+      <long>
+         <en>Historically store updates of asset/user relation and view them for user or for asset. Currently supported asset types are: Computers, Monitors, Network devices, Devices, Printers, Phones</en>
+         <de>Historische Speicherung der Beziehung zwischen Asset und Benutzer um diese tabellarisch für Benutzer oder Asset darzustellen. Zur Zeit werden folgende Asset-Typen unterstützt: Computer, Monitore, Netzwerkgeräte, Geräte, Drucker, Telefone</de>
+         <it>Salva relazioni tra inventario ed utente historicamente per farli vedere per utente o per inventario. Tipi di inventario attualmente supportati: Computer, Monitor, Apparati di rete, Periferiche, Stampanti, Telefoni</it>
+      </long>
+   </description>
+   <homepage>https://github.com/pluginsGLPI/assetusers</homepage>
+   <download>https://github.com/pluginsGLPI/assetusers/releases</download>
+   <issues>https://github.com/pluginsGLPI/assetusers/issues</issues>
+   <readme>https://github.com/pluginsGLPI/assetusers/blob/master/README.md</readme>
+   <authors>
+      <author>i-Vertix</author>
+   </authors>
+   <versions>
+      <!-- Add as many version tag you want -->
+      <version>
+         <num>1.0.0</num>
+         <!-- Add as many compatibility tag you want -->
+         <compatibility>10.0.x</compatibility>
+      </version>
+   </versions>
+   <langs>
+      <lang>en_GB</lang>
+      <lang>de_DE</lang>
+      <lang>it_IT</lang>
+   </langs>
+   <license>MIT</license>
+   <!--tags>
+      <en>
+         <tag>One tag</tag>
+         <tag>Another tag</tag>
+      </en>
+      <fr>
+         <tag>Un tag</tag>
+         <tag>Un autre tag</tag>
+      </fr>
+   </tags-->
+   <!--screenshots>
+      <screenshot>https://github.com/pluginsGLPI/fields/raw/master/screenshot.png</screenshot>
+      <screenshot>https://github.com/pluginsGLPI/fields/raw/master/screenshot2.png</screenshot>
+   </screenshots-->
+</root>
