@@ -28,7 +28,7 @@ Once installed and activated the plugin hooks (with database triggers due to mis
 
 ## 🛠️ INSTALLATION 🛠️
 
-Download plugin archive from https://github.com/i-Vertix/glpi-modifications/releases for the required GLPI version and
+Download plugin archive from https://github.com/i-Vertix/glpi-assetuserhistory/releases for the required GLPI version and
 unzip the archive to the **glpi plugins folder**. After unzipping a new folder called **"assetuserhistory"** should
 appear in your plugin folder.
 If not, make sure the unzipped folder is located in the glpi plugins folder (**glpi/plugins**) and is renamed to
