@@ -2,7 +2,7 @@
    <name>Asset-User History</name>
    <key>assetuserhistory</key>
    <state>stable</state>
-   <logo>https://raw.githubusercontent.com/pluginsGLPI/assetusers/master/{LNAME}.png</logo>
+   <logo>https://avatars.githubusercontent.com/u/56337586</logo>
    <description>
       <short>
          <en>Asset-User History plugin for GLPI</en>
@@ -15,17 +15,17 @@
          <it>Salva relazioni tra inventario ed utente historicamente per farli vedere per utente o per inventario. Tipi di inventario attualmente supportati: Computer, Monitor, Apparati di rete, Periferiche, Stampanti, Telefoni</it>
       </long>
    </description>
-   <homepage>https://github.com/pluginsGLPI/assetusers</homepage>
-   <download>https://github.com/pluginsGLPI/assetusers/releases</download>
-   <issues>https://github.com/pluginsGLPI/assetusers/issues</issues>
-   <readme>https://github.com/pluginsGLPI/assetusers/blob/master/README.md</readme>
+   <homepage>https://github.com/i-Vertix/glpi-assetuserhistory</homepage>
+   <download>https://github.com/i-Vertix/glpi-assetuserhistory/releases</download>
+   <issues>https://github.com/i-Vertix/glpi-assetuserhistory/issues</issues>
+   <readme>https://github.com/i-Vertix/glpi-assetuserhistory/blob/master/README.md</readme>
    <authors>
       <author>i-Vertix</author>
    </authors>
    <versions>
       <!-- Add as many version tag you want -->
       <version>
-         <num>1.0.0</num>
+         <num>1.1.0</num>
          <!-- Add as many compatibility tag you want -->
          <compatibility>10.0.x</compatibility>
       </version>
