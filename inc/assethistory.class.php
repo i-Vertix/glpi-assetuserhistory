@@ -1,5 +1,6 @@
 <?php
 
+/** @noinspection AutoloadingIssuesInspection */
 /** @noinspection PhpUnused */
 
 /**
@@ -69,7 +70,7 @@ class PluginAssetuserhistoryAssetHistory extends CommonDBRelation
                 FROM glpi_plugin_assetuserhistory_history as h
                 INNER JOIN glpi_users as u ON (h.`users_id` = u.`id`)
                 WHERE h.users_id = $userId";
-        $results = $DB->query($query)->fetch_all(MYSQLI_ASSOC);
+        $results = $DB->doQuery($query)->fetch_all(MYSQLI_ASSOC);
 
         if (count($results) === 0) return 0;
 
@@ -145,7 +146,7 @@ class PluginAssetuserhistoryAssetHistory extends CommonDBRelation
                 INNER JOIN $assetTable as a ON h.assets_id = a.id
                 WHERE h.assets_id = $assetId and h.assets_type = '$assetType'";
 
-        $results = $DB->query($query)->fetch_all(MYSQLI_ASSOC);
+        $results = $DB->doQuery($query)->fetch_all(MYSQLI_ASSOC);
 
         if (count($results) === 0) return 0;
 
@@ -197,6 +198,8 @@ class PluginAssetuserhistoryAssetHistory extends CommonDBRelation
         // INVERT ORDER FOR QUERY BECAUSE SORT FIELD IS INVERTED (TO INVERT NULL VALUES)
         $orderForQuery = $order === "ASC" ? "DESC" : "ASC";
 
+        $orderBy = $sort === "assigned" ? "isnull({$sort}) {$orderForQuery}, -{$sort} {$orderForQuery}" : "-{$sort} {$orderForQuery}";
+
         $query = "SELECT
                 h.assigned as assigned,
                 h.revoked as revoked,
@@ -206,9 +209,8 @@ class PluginAssetuserhistoryAssetHistory extends CommonDBRelation
                 glpi_plugin_assetuserhistory_history h
             WHERE
                 h.users_id = $id
-            ORDER BY
-                -$sort $orderForQuery";
-        $results = $DB->query($query)->fetch_all(MYSQLI_ASSOC);
+            ORDER BY {$orderBy}";
+        $results = $DB->doQuery($query)->fetch_all(MYSQLI_ASSOC);
 
         $isFiltered = false;
 
@@ -407,7 +409,7 @@ class PluginAssetuserhistoryAssetHistory extends CommonDBRelation
                 echo '<td>' . $res["assets_name"] . '</td>';
             }
             echo "<td>" . __(self::getDisplayNameForAssetType($res["assets_type"])) . "</td>";
-            echo "<td>" . Html::convDateTime($res["assigned"], null, true) . "</td>";
+            echo "<td>" . ($res["assigned"] === null ? "?" : Html::convDateTime($res["assigned"], null, true)) . "</td>";
             echo "<td>" . Html::convDateTime($res["revoked"], null, true) . "</td>";
             echo "<td></td>";
             echo "</tr>\n";
@@ -464,6 +466,8 @@ function handleSort(field, order) {
         // INVERT ORDER FOR QUERY BECAUSE SORT FIELD IS INVERTED (TO INVERT NULL VALUES)
         $orderForQuery = $order === "ASC" ? "DESC" : "ASC";
 
+        $orderBy = $sort === "assigned" ? "isnull({$sort}) {$orderForQuery}, -{$sort} {$orderForQuery}" : "-{$sort} {$orderForQuery}";
+
         $query = "SELECT
                 u.id as users_id,
                 u.name as users_name,
@@ -475,12 +479,12 @@ function handleSort(field, order) {
             WHERE
                 h.assets_id = $id
                 and h.assets_type = '$type'
-            ORDER BY
-                -$sort $orderForQuery";
+            ORDER BY {$orderBy}";
 
-        $results = $DB->query($query)->fetch_all(MYSQLI_ASSOC);
+        $results = $DB->doQuery($query)->fetch_all(MYSQLI_ASSOC);
 
         $isFiltered = false;
+        $total = 0;
 
         if (count($results) > 0) {
 
@@ -595,7 +599,7 @@ function handleSort(field, order) {
             } else {
                 echo '<td>' . $res["users_name"] . '</td>';
             }
-            echo "<td>" . Html::convDateTime($res["assigned"], null, true) . "</td>";
+            echo "<td>" . ($res["assigned"] === null ? "?" : Html::convDateTime($res["assigned"], null, true)) . "</td>";
             echo "<td>" . Html::convDateTime($res["revoked"], null, true) . "</td>";
             echo "<td></td>";
             echo "</tr>\n";

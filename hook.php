@@ -32,51 +32,27 @@
  */
 
 /**
- * Plugin install process
- *
- * @return boolean
- * @noinspection PhpUnused
+ * Creates add and update triggers for the given table
+ * @param string $table
+ * @param string $type
+ * @return void
  */
-function plugin_assetuserhistory_install(): bool
+function plugin_assetuserhistory_create_triggers(string $table, string $type): void
 {
     global $DB;
-    $migration = new Migration(PLUGIN_ASSETUSERHISTORY_VERSION);
 
-    // COMPUTER
-    if (!$DB->tableExists("glpi_plugin_assetuserhistory_history")) {
-        $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_assetuserhistory_history` (
-            `id` int unsigned not null primary key auto_increment,
-            `users_id` int unsigned not null ,
-            `assets_id` int unsigned not null ,
-            `assets_type` varchar(255) not null ,
-            `assigned` timestamp null,
-            `revoked` timestamp null
-          )";
-        $DB->queryOrDie($query, "table glpi_plugin_assetuserhistory_history created");
-    }
+    $default_charset = DBConnection::getDefaultCharset();
+    $default_collation = DBConnection::getDefaultCollation();
 
-    // WITHOUT STRICT_TRANS_TABLES TRIGGERS DO NOT WORK CORRECTLY
-    $DB->query("SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION'");
+    $name = strtolower($type);
 
-    $tablesForTriggers = [
-        ["glpi_computers", "Computer"],
-        ["glpi_monitors", "Monitor"],
-        ["glpi_networkequipments", "NetworkEquipment"],
-        ["glpi_peripherals", "Peripheral"],
-        ["glpi_phones", "Phone"],
-        ["glpi_printers", "Printer"],
-    ];
-
-    foreach ($tablesForTriggers as [$table, $type]) {
-        $name = strtolower($type);
-
-        $DB->queryOrDie("
-create or replace trigger plugin_assetuserhistory_". $name. "_add
+    $DB->doQueryOrDie("
+create or replace trigger plugin_assetuserhistory_" . $name . "_add
     after insert
     on " . $table . "
     for each row
 begin
-    DECLARE aType varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+    DECLARE aType varchar(50) CHARACTER SET {$default_charset} COLLATE {$default_collation};
     SET aType = '" . $type . "';
     if (NEW.users_id <> 0 and NEW.users_id is not null and NEW.users_id is not null) then
         insert into glpi_plugin_assetuserhistory_history (users_id, assets_id, assets_type, assigned)
@@ -85,7 +61,7 @@ begin
 end;
 ");
 
-        $DB->queryOrDie("
+    $DB->doQueryOrDie("
 create or replace trigger plugin_assetuserhistory_" . $name . "_update
     after update
     on " . $table . "
@@ -109,6 +85,77 @@ begin
     end if;
 end;
 ");
+}
+
+
+/**
+ * @return int 0|1 = 0 not installed, 1 = installed
+ */
+function plugin_assetuserhistory_needUpdateOrInstall() {
+    /** @var DBmysql $DB */
+    global $DB;
+
+    // check if table exists
+    if (!$DB->tableExists('glpi_plugin_assetuserhistory_history')) {
+        return 0;
+    }
+
+    return 1;
+}
+
+/**
+ * Plugin install process
+ *
+ * @return boolean
+ * @noinspection PhpUnused
+ */
+function plugin_assetuserhistory_install(): bool
+{
+    global $DB;
+    $migration = new Migration(PLUGIN_ASSETUSERHISTORY_VERSION);
+
+    $default_charset = DBConnection::getDefaultCharset();
+    $default_collation = DBConnection::getDefaultCollation();
+    $default_key_sign = DBConnection::getDefaultPrimaryKeySignOption();
+
+    // create the history table
+    if (!$DB->tableExists("glpi_plugin_assetuserhistory_history")) {
+        $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_assetuserhistory_history` (
+            `id` int {$default_key_sign} not null primary key auto_increment,
+            `users_id` int {$default_key_sign} not null ,
+            `assets_id` int {$default_key_sign} not null ,
+            `assets_type` varchar(255) not null ,
+            `assigned` timestamp null,
+            `revoked` timestamp null
+          ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
+        $DB->doQueryOrDie($query, "table glpi_plugin_assetuserhistory_history created");
+    }
+
+    // WITHOUT STRICT_TRANS_TABLES TRIGGERS DO NOT WORK CORRECTLY
+    $DB->doQuery("SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION'");
+
+    $plugin = new Plugin();
+
+    $tablesForTriggers = [
+        ["glpi_computers", "Computer"],
+        ["glpi_monitors", "Monitor"],
+        ["glpi_networkequipments", "NetworkEquipment"],
+        ["glpi_peripherals", "Peripheral"],
+        ["glpi_phones", "Phone"],
+        ["glpi_printers", "Printer"],
+    ];
+
+    if ($plugin->isInstalled("simcard")) {
+        $tablesForTriggers[] = ["glpi_plugin_simcard_simcards", "PluginSimcardSimcard"];
+    }
+
+    foreach ($tablesForTriggers as [$table, $type]) {
+        plugin_assetuserhistory_create_triggers($table, $type);
+
+        $DB->doQuery("insert into glpi_plugin_assetuserhistory_history (users_id, assets_id, assets_type) 
+select t.users_id, t.id, '" . $type . "' from " . $table . " as t
+left join glpi_plugin_assetuserhistory_history as h on h.assets_id = t.id and h.assets_type = '" . $type . "'
+where t.users_id <> 0 and t.users_id is not null and t.is_deleted = 0 and h.id is null;");
     }
 
     $migration->executeMigration();
@@ -128,8 +175,10 @@ function plugin_assetuserhistory_uninstall(): bool
 
     if ($DB->tableExists("glpi_plugin_assetuserhistory_history")) {
         $query = "DROP TABLE glpi_plugin_assetuserhistory_history;";
-        $DB->queryOrDie($query, "table glpi_plugin_assetuserhistory_history deleted");
+        $DB->doQueryOrDie($query, "table glpi_plugin_assetuserhistory_history deleted");
     }
+
+    $plugin = new Plugin();
 
     $triggerNames = [
         "computer",
@@ -140,9 +189,13 @@ function plugin_assetuserhistory_uninstall(): bool
         "printer",
     ];
 
+    if ($plugin->isInstalled("simcard")) {
+        $triggerNames[] = "pluginsimcardsimcard";
+    }
+
     foreach ($triggerNames as $name) {
-        $DB->queryOrDie("drop trigger if exists plugin_assetuserhistory_" . $name . "_add;");
-        $DB->queryOrDie("drop trigger if exists plugin_assetuserhistory_" . $name . "_update;");
+        $DB->doQueryOrDie("drop trigger if exists plugin_assetuserhistory_" . $name . "_add;");
+        $DB->doQueryOrDie("drop trigger if exists plugin_assetuserhistory_" . $name . "_update;");
     }
 
 
@@ -178,4 +231,27 @@ function plugin_assetuserhistory_item_purge_user(User $item): void
     $id = $item->getID();
     $stmt->bind_param("i", $id);
     $stmt->execute();
+}
+
+/**
+ * @param string $plugin
+ * @return void
+ */
+function plugin_assetuserhistory_ext_plugin_install(string $plugin): void
+{
+    if ($plugin === "simcard") {
+        plugin_assetuserhistory_create_triggers("glpi_plugin_simcard_simcards", "PluginSimcardSimcard");
+    }
+}
+
+/**
+ * @param string $plugin
+ * @return void
+ */
+function plugin_assetuserhistory_ext_plugin_uninstall(string $plugin): void
+{
+    global $DB;
+    if ($plugin === "simcard") {
+        $DB->doQuery("delete from glpi_plugin_assetuserhistory_history where assets_type = 'PluginSimcardSimcard'");
+    }
 }

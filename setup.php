@@ -33,7 +33,7 @@
 
 use Glpi\Plugin\Hooks;
 
-const PLUGIN_ASSETUSERHISTORY_VERSION = '1.0.0';
+const PLUGIN_ASSETUSERHISTORY_VERSION = '1.1.0';
 
 // Minimal GLPI version, inclusive
 const PLUGIN_ASSETUSERHISTORY_MIN_GLPI_VERSION = "10.0";
@@ -55,20 +55,27 @@ function plugin_init_assetuserhistory(): void
     $plugin = new Plugin();
 
     if (Session::getLoginUserID() && $plugin->isActivated('assetuserhistory')) {
+
+        $injections = ['User', 'Computer', 'Monitor', 'NetworkEquipment', 'Peripheral', 'Phone', 'Printer'];
+        if ($plugin->isActivated("simcard")) $injections[] = "PluginSimcardSimcard";
+
         $plugin::registerClass('PluginAssetuserhistoryAssetHistory', [
-            'addtabon' => ['User', 'Computer', 'Monitor', 'NetworkEquipment', 'Peripheral', 'Phone', 'Printer'],
+            'addtabon' => $injections,
         ]);
 
         // FIRE ON DELETE FUNCTION (PERMANENTLY) TO DELETE HISTORY WHEN ASSET OF FOLLOWING TYPES IS DELETED
-        $PLUGIN_HOOKS[Hooks::ITEM_PURGE]['assetuserhistory'] = [
-            'Computer' => 'plugin_assetuserhistory_item_purge_asset',
-            'Monitor' => 'plugin_assetuserhistory_item_purge_asset',
-            'NetworkEquipment' => 'plugin_assetuserhistory_item_purge_asset',
-            'Peripheral' => 'plugin_assetuserhistory_item_purge_asset',
-            'Phone' => 'plugin_assetuserhistory_item_purge_asset',
-            'Printer' => 'plugin_assetuserhistory_item_purge_asset',
-            'User' => 'plugin_assetuserhistory_item_purge_user'
-        ];
+        $purgeActions = [];
+        foreach ($injections as $injection) {
+            if ($injection === "User") {
+                $purgeActions[$injection] = "plugin_assetuserhistory_item_purge_user";
+            } else {
+                $purgeActions[$injection] = "plugin_assetuserhistory_item_purge_asset";
+            }
+        }
+        $PLUGIN_HOOKS[Hooks::ITEM_PURGE]['assetuserhistory'] = $purgeActions;
+
+        $PLUGIN_HOOKS[Hooks::POST_PLUGIN_INSTALL]["assetuserhistory"] = "plugin_assetuserhistory_ext_plugin_install";
+        $PLUGIN_HOOKS[Hooks::POST_PLUGIN_UNINSTALL]["assetuserhistory"] = "plugin_assetuserhistory_ext_plugin_uninstall";
     }
 }
 
