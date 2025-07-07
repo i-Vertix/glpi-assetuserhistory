@@ -13,6 +13,7 @@ Once installed and activated the plugin hooks (with database triggers due to mis
 * **Devices**
 * **Printers**
 * **Phones**
+* **[Simcard](https://github.com/i-Vertix/simcard)**
 
 > **Note:**
 > When an asset or a user gets **permanently** deleted, all history depending on the deleted item is deleted too.
@@ -33,6 +34,8 @@ unzip the archive to the **glpi plugins folder**. After unzipping a new folder c
 appear in your plugin folder.
 If not, make sure the unzipped folder is located in the glpi plugins folder (**glpi/plugins**) and is renamed to
 "assetuserhistory".
+
+**Important:** Before installing the plugin in the GLPI interface, make sure the GLPI database user can manage (create/update/execute/drop) triggers.
 
 ## 🔎 VIEWS 🔎
 
@@ -67,5 +70,5 @@ A new table is available in the form view of a user:
 
 ## ⚙️ CONTRIBUTING ⚙️
 
-Open a ticket for each bug/feature, so it can be discussed.
+Open a ticket for a bug/feature, so it can be discussed.
 We will answer as soon as possible to your request or problem.
