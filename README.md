@@ -9,8 +9,12 @@ This plugin introduces a dedicated history for asset/user relations.
 
 ## 📌 Information
 
-Once installed and activated, the plugin hooks (with database triggers due to missing glpi-hook support on inventory
-updates) into asset updates and stores every user-relation change separately.
+This plugin is not reliant on the default in-built history. The plugin introduces a new table to store the user relation
+changes of assets. Therefore, the plugin is also not affected by any *Logs purge settings* done in *Setup/General/Logs
+purge*.
+
+Once installed and activated, the plugin hooks (using database triggers due to missing hook-support on inventory
+updates) into asset creations/updates/deletes and stores every user relation change separately.
 
 By default, the history is gathered and activated for the following assets:
 
