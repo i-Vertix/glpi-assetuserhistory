@@ -112,6 +112,7 @@ As stated, by default the plugin is enabled for the following asset types: *Comp
 Since version `1.2.0` you can manage your own list of supported asset types by creating a file named `injections.list`
 in `<glpi lib directory>/_plugins/assetuserhistory`.
 The file must contain a list of all asset **class names** you want to have enabled (comma or newline separated).
+A template file is present in the plugin directory to get a better understanding of what the file needs to look like.
 
 An asset from a plugin may be injected by giving the complete namespace (GlpiPlugin\Exampleplugin\Myasset) in case of
 plugins using the new file/folder structure (when classes are located in `exampleplugin/src`) or the classname of legacy
