@@ -2,13 +2,10 @@
 
 /**
  * -------------------------------------------------------------------------
- * AssetUserHistory plugin for GLPI
- * @copyright Copyright (C) 2023 by i-Vertix (https://i-vertix.com)
- * @license   MIT https://opensource.org/licenses/mit-license.php
- * @link      https://github.com/i-Vertix/assetuserhistory
+ * Asset-User History plugin for GLPI
  * -------------------------------------------------------------------------
  *
- * MIT License
+ * This file is part of Asset-User History plugin for GLPI.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,18 +24,57 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * --------------------------------------------------------------------------
+ * -------------------------------------------------------------------------
+ * @copyright Copyright (C) 2025 by i-Vertix/PGUM.
+ * @license   MIT https://opensource.org/license/mit
+ * @link      https://github.com/i-Vertix/glpi-assetuserhistory
+ * -------------------------------------------------------------------------
  */
 
 use Glpi\Plugin\Hooks;
 
-const PLUGIN_ASSETUSERHISTORY_VERSION = '1.1.0';
+const PLUGIN_ASSETUSERHISTORY_VERSION = '1.2.0';
 
-// Minimal GLPI version, inclusive
-const PLUGIN_ASSETUSERHISTORY_MIN_GLPI_VERSION = "10.0";
-// Maximum GLPI version, exclusive
-const PLUGIN_ASSETUSERHISTORY_MAX_GLPI_VERSION = "11.0";
+/**
+ * Retrieve the list of allowed asset user history injections
+ *
+ * @return array List of asset types for which user history injections are applicable
+ * @noinspection PhpUnused
+ */
+function plugin_assetuserhistory_injections(): array
+{
+    $default = ['Computer', 'Monitor', 'NetworkEquipment', 'Peripheral', 'Phone', 'Printer'];
+    if (!defined('GLPI_PLUGIN_DOC_DIR')) {
+        return $default;
+    }
+
+    $file = GLPI_PLUGIN_DOC_DIR . '/assetuserhistory/injections.list';
+    if (!is_file($file) || !is_readable($file)) {
+        return $default;
+    }
+
+    $content = trim((string)file_get_contents($file));
+    if ($content === '') {
+        return $default;
+    }
+
+    $injections = array_unique(preg_split('/[\s,]+/', $content, -1, PREG_SPLIT_NO_EMPTY));
+    if (empty($injections)) {
+        return $default;
+    }
+
+    // Always ensure "User" is present and remove duplicates
+    $injections = array_filter($injections, static fn($i) => $i !== 'User');
+
+    // Validate all classes exist
+    foreach ($injections as $class) {
+        if (!class_exists($class) || !(new $class) instanceof CommonDBTM) {
+            return $default;
+        }
+    }
+
+    return array_values($injections);
+}
 
 /**
  * Init hooks of the plugin.
@@ -51,32 +87,42 @@ function plugin_init_assetuserhistory(): void
 {
     global $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS['csrf_compliant']['assetuserhistory'] = true;
+    // UNCOMMENT THE FOLLOWING BLOCK IF TRIGGERS FAIL TO INSTALL - STRICT_TRANS_TABLES NEED TO BE ENABLED FOR SESSION FOR TRIGGERS TO INSTALL CORRECTLY
+    /*
+    global $DB;
+    // ADDS STRICT_TRANS_TABLES TO SQL MODE IF NOT ALREADY PRESENT
+    $DB->doQuery("SET SESSION sql_mode = IF(LOCATE('STRICT_TRANS_TABLES', @@SESSION.sql_mode) = 0, CONCAT(@@SESSION.sql_mode, ',STRICT_TRANS_TABLES'), @@SESSION.sql_mode)");
+    // ADDS NO_ENGINE_SUBSTITUTION TO SQL MODE IF NOT ALREADY PRESENT
+    $DB->doQuery("SET SESSION sql_mode = IF(LOCATE('NO_ENGINE_SUBSTITUTION', @@SESSION.sql_mode) = 0, CONCAT(@@SESSION.sql_mode, ',NO_ENGINE_SUBSTITUTION'), @@SESSION.sql_mode)");
+    */
+
     $plugin = new Plugin();
 
+    $injections = plugin_assetuserhistory_injections();
     if (Session::getLoginUserID() && $plugin->isActivated('assetuserhistory')) {
-
-        $injections = ['User', 'Computer', 'Monitor', 'NetworkEquipment', 'Peripheral', 'Phone', 'Printer'];
-        if ($plugin->isActivated("simcard")) $injections[] = "PluginSimcardSimcard";
-
-        $plugin::registerClass('PluginAssetuserhistoryAssetHistory', [
-            'addtabon' => $injections,
-        ]);
-
-        // FIRE ON DELETE FUNCTION (PERMANENTLY) TO DELETE HISTORY WHEN ASSET OF FOLLOWING TYPES IS DELETED
-        $purgeActions = [];
-        foreach ($injections as $injection) {
-            if ($injection === "User") {
-                $purgeActions[$injection] = "plugin_assetuserhistory_item_purge_user";
-            } else {
-                $purgeActions[$injection] = "plugin_assetuserhistory_item_purge_asset";
-            }
+        if (Session::haveRight(GlpiPlugin\Assetuserhistory\History::$rightname, GlpiPlugin\Assetuserhistory\History::VIEW_USER_HISTORY)) {
+            $plugin::registerClass(GlpiPlugin\Assetuserhistory\History::class, [
+                'addtabon' => $injections,
+            ]);
         }
-        $PLUGIN_HOOKS[Hooks::ITEM_PURGE]['assetuserhistory'] = $purgeActions;
-
-        $PLUGIN_HOOKS[Hooks::POST_PLUGIN_INSTALL]["assetuserhistory"] = "plugin_assetuserhistory_ext_plugin_install";
-        $PLUGIN_HOOKS[Hooks::POST_PLUGIN_UNINSTALL]["assetuserhistory"] = "plugin_assetuserhistory_ext_plugin_uninstall";
+        if (Session::haveRight(GlpiPlugin\Assetuserhistory\History::$rightname, GlpiPlugin\Assetuserhistory\History::VIEW_ASSET_HISTORY)) {
+            $plugin::registerClass(GlpiPlugin\Assetuserhistory\History::class, [
+                'addtabon' => [User::class],
+            ]);
+        }
     }
+
+    // PROFILE (ACL)
+    Plugin::registerClass(GlpiPlugin\Assetuserhistory\Profile::class, ['addtabon' => [Profile::class]]);
+
+    // FIRE ON DELETE FUNCTION (PERMANENTLY) TO DELETE HISTORY WHEN ITEM OF INJECTED TYPES IS DELETED
+    $purgeActions = [
+        User::class => "plugin_assetuserhistory_item_purge_user"
+    ];
+    foreach ($injections as $injection) {
+        $purgeActions[$injection] = "plugin_assetuserhistory_item_purge_asset";
+    }
+    $PLUGIN_HOOKS[Hooks::ITEM_PURGE]['assetuserhistory'] = $purgeActions;
 }
 
 
@@ -98,41 +144,9 @@ function plugin_version_assetuserhistory(): array
         'homepage' => 'i-vertix.com',
         'requirements' => [
             'glpi' => [
-                'min' => PLUGIN_ASSETUSERHISTORY_MIN_GLPI_VERSION,
-                'max' => PLUGIN_ASSETUSERHISTORY_MAX_GLPI_VERSION,
+                'min' => "11.0.0",
+                'max' => "11.0.99",
             ]
         ]
     ];
-}
-
-/**
- * Check pre-requisites before install
- * OPTIONNAL, but recommanded
- *
- * @return boolean
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_check_prerequisites(): bool
-{
-    if (version_compare(GLPI_VERSION, PLUGIN_ASSETUSERHISTORY_MIN_GLPI_VERSION, 'lt') || version_compare(GLPI_VERSION, PLUGIN_ASSETUSERHISTORY_MAX_GLPI_VERSION, 'ge')) {
-        echo "This plugin requires GLPI >= " . PLUGIN_ASSETUSERHISTORY_MIN_GLPI_VERSION . " and GLPI < " . PLUGIN_ASSETUSERHISTORY_MAX_GLPI_VERSION;
-        return false;
-    }
-    return true;
-}
-
-/**
- * Check configuration process
- *
- * @param boolean $verbose Whether to display message on failure. Defaults to false
- *
- * @return boolean
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_check_config($verbose = false): bool
-{
-    if ($verbose) {
-        echo 'Installed / not configured';
-    }
-    return true;
 }

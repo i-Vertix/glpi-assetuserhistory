@@ -1,53 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <root>
-   <name>Asset-User History</name>
-   <key>assetuserhistory</key>
-   <state>stable</state>
-   <logo>https://avatars.githubusercontent.com/u/56337586</logo>
-   <description>
-      <short>
-         <en>Asset-User History plugin for GLPI</en>
-         <de>Asset-User History plugin für GLPI</de>
-         <it>Asset-User History plugin per GLPI</it>
-      </short>
-      <long>
-         <en>Historically store updates of asset/user relation and view them for user or for asset. Currently supported asset types are: Computers, Monitors, Network devices, Devices, Printers, Phones</en>
-         <de>Historische Speicherung der Beziehung zwischen Asset und Benutzer um diese tabellarisch für Benutzer oder Asset darzustellen. Zur Zeit werden folgende Asset-Typen unterstützt: Computer, Monitore, Netzwerkgeräte, Geräte, Drucker, Telefone</de>
-         <it>Salva relazioni tra inventario ed utente historicamente per farli vedere per utente o per inventario. Tipi di inventario attualmente supportati: Computer, Monitor, Apparati di rete, Periferiche, Stampanti, Telefoni</it>
-      </long>
-   </description>
-   <homepage>https://github.com/i-Vertix/glpi-assetuserhistory</homepage>
-   <download>https://github.com/i-Vertix/glpi-assetuserhistory/releases</download>
-   <issues>https://github.com/i-Vertix/glpi-assetuserhistory/issues</issues>
-   <readme>https://github.com/i-Vertix/glpi-assetuserhistory/blob/master/README.md</readme>
-   <authors>
-      <author>i-Vertix</author>
-   </authors>
-   <versions>
-      <!-- Add as many version tag you want -->
-      <version>
-         <num>1.1.0</num>
-         <!-- Add as many compatibility tag you want -->
-         <compatibility>10.0.x</compatibility>
-      </version>
-   </versions>
-   <langs>
-      <lang>en_GB</lang>
-      <lang>de_DE</lang>
-      <lang>it_IT</lang>
-   </langs>
-   <license>MIT</license>
-   <!--tags>
-      <en>
-         <tag>One tag</tag>
-         <tag>Another tag</tag>
-      </en>
-      <fr>
-         <tag>Un tag</tag>
-         <tag>Un autre tag</tag>
-      </fr>
-   </tags-->
-   <!--screenshots>
-      <screenshot>https://github.com/pluginsGLPI/fields/raw/master/screenshot.png</screenshot>
-      <screenshot>https://github.com/pluginsGLPI/fields/raw/master/screenshot2.png</screenshot>
-   </screenshots-->
+    <name>Asset-User History</name>
+    <key>assetuserhistory</key>
+    <state>stable</state>
+    <logo>https://raw.githubusercontent.com/i-Vertix/glpi-assetuserhistory/main/assetuserhistory.png</logo>
+    <description>
+        <short>
+            <en>Dedicated history for asset-user relation-changes</en>
+            <de>Eigenständiger Verlauf von Asset-Benutzerzuweisungen</de>
+            <it>Storico dedicato per cambiamenti relazionali tra nventario-utente</it>
+        </short>
+        <long>
+            <en>This plugin adds a dedicated history of any asset-user relation change to keep track of whom the asset
+                belonged to.
+            </en>
+            <de>Dieses Plugin fügt eine eigene Historie für alle Änderungen der Beziehung zwischen Asset und Benutzer
+                hinzu, um nachzuverfolgen, wem das Asset gehört hat.
+            </de>
+            <it>Questo plugin aggiunge una cronologia dedicata a tutte le modifiche della relazione tra bene e utente,
+                per tenere traccia di a chi apparteneva l'inventario.
+            </it>
+        </long>
+    </description>
+    <homepage>https://github.com/i-Vertix/glpi-assetuserhistory</homepage>
+    <download>https://github.com/i-Vertix/glpi-assetuserhistory/releases</download>
+    <issues>https://github.com/i-Vertix/glpi-assetuserhistory/issues</issues>
+    <readme>https://github.com/i-Vertix/glpi-assetuserhistory/blob/main/README.md</readme>
+    <authors>
+        <author>i-Vertix</author>
+    </authors>
+    <versions>
+        <version>
+            <num>1.2.0</num>
+            <compatibility>11.0.x</compatibility>
+            <download_url>
+                https://github.com/i-Vertix/glpi-assetuserhistory/releases/download/1.2.0/glpi-assetuserhistory-1.2.0.tar.gz
+            </download_url>
+        </version>
+        <version>
+            <num>1.1.0</num>
+            <compatibility>10.0.x</compatibility>
+            <download_url>
+                https://github.com/i-Vertix/glpi-assetuserhistory/releases/download/1.1.0/glpi-assetuserhistory-1.1.0.tar.gz
+            </download_url>
+        </version>
+    </versions>
+    <langs>
+        <lang>en_GB</lang>
+        <lang>de_DE</lang>
+        <lang>it_IT</lang>
+    </langs>
+    <license>MIT</license>
+    <tags>
+        <en>
+            <tag>history</tag>
+            <tag>user</tag>
+            <tag>asset</tag>
+            <tag>belong</tag>
+        </en>
+        <de>
+            <tag>verlauf</tag>
+            <tag>benutzer</tag>
+            <tag>asset</tag>
+            <tag>gehört</tag>
+        </de>
+        <it>
+            <tag>storico</tag>
+            <tag>utente</tag>
+            <tag>asset</tag>
+            <tag>inventario</tag>
+        </it>
+    </tags>
+    <screenshots>
+        <screenshot>https://github.com/i-Vertix/glpi-assetuserhistory/raw/main/screenshots/user-history.png</screenshot>
+        <screenshot>https://github.com/i-Vertix/glpi-assetuserhistory/raw/main/screenshots/asset-history.png</screenshot>
+        <screenshot>https://github.com/i-Vertix/glpi-assetuserhistory/raw/main/screenshots/profile.png</screenshot>
+    </screenshots>
 </root>

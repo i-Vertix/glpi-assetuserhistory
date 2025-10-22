@@ -3,26 +3,57 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-20 12:48+0000\n"
-"PO-Revision-Date: 2023-05-03 16:03+0200\n"
+"POT-Creation-Date: 2025-10-22 10:29+0200\n"
+"PO-Revision-Date: 2025-10-22 10:38+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it_IT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.6\n"
 
-msgid "Revoked"
-msgstr "Ritirato"
+#: src/History.php:250
+msgid "View history"
+msgstr "Visualizza cronologia"
 
+#: src/History.php:268
+msgid "For asset"
+msgstr "Per inventario"
+
+#: src/History.php:269
+msgid "For user"
+msgstr "Per utente"
+
+#: src/History.php:441
 msgid "Asset history"
-msgstr "Storico inventario"
+msgstr "Storico dell' inventario"
 
+#: src/History.php:447
 msgid "User history"
-msgstr "Storico utente"
+msgstr "Storia dell'utente"
+
+#: src/History.php:588
+msgid "User deleted"
+msgstr "Utente eliminato"
+
+#: src/History.php:616 src/History.php:787
+msgid "Assigned"
+msgstr "Assegnato"
+
+#: src/History.php:620 src/History.php:791
+msgid "Revoked"
+msgstr "Revocato"
+
+#: src/Profile.php:28
+msgid "Asset-User history"
+msgstr "Storico inventario-utente"
+
+#: src/Profile.php:68
+msgid "View asset-user history"
+msgstr "Visualizza storico inventario-utente"

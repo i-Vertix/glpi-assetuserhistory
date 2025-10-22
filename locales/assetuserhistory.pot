@@ -1,58 +1,58 @@
-# English translations for PACKAGE package.
-# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-22 10:29+0200\n"
-"PO-Revision-Date: 2025-10-22 10:29+0200\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
-"Language: en_GB\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/History.php:250
 msgid "View history"
-msgstr "View history"
+msgstr ""
 
 #: src/History.php:268
 msgid "For asset"
-msgstr "For asset"
+msgstr ""
 
 #: src/History.php:269
 msgid "For user"
-msgstr "For user"
+msgstr ""
 
 #: src/History.php:441
 msgid "Asset history"
-msgstr "Asset history"
+msgstr ""
 
 #: src/History.php:447
 msgid "User history"
-msgstr "User history"
+msgstr ""
 
 #: src/History.php:588
 msgid "User deleted"
-msgstr "User deleted"
+msgstr ""
 
 #: src/History.php:616 src/History.php:787
 msgid "Assigned"
-msgstr "Assigned"
+msgstr ""
 
 #: src/History.php:620 src/History.php:791
 msgid "Revoked"
-msgstr "Revoked"
+msgstr ""
 
 #: src/Profile.php:28
 msgid "Asset-User history"
-msgstr "Asset-User history"
+msgstr ""
 
 #: src/Profile.php:68
 msgid "View asset-user history"
-msgstr "View asset-user history"
+msgstr ""
