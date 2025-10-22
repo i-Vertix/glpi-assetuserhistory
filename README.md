@@ -35,11 +35,11 @@ By default, the history is gathered and activated for the following assets:
 
 - added a new profile right to view asset-user and/or user-asset history
 
-  > **Note:**
-  > During the installation of version `1.2.0`, the right to view the asset history (in user) is automatically set to
-  every profile
-  > with *READ* permissions for *User*. The right to view the user history (in asset) is automatically set to every
-  > profile with *READ* permissions for **any** *Asset*.
+> [!NOTE]
+> During the installation of version `1.2.0`, the right to view the asset history (in user) is automatically set to
+> every profile
+> with *READ* permissions for *User*. The right to view the user history (in asset) is automatically set to every
+> profile with *READ* permissions for **any** *Asset*.
 
 - history entry is no longer deleted when a user gets deleted (shows as *User deleted* in asset-user history)
 - added the possibility to inject custom asset types **before** installing the
@@ -54,7 +54,7 @@ By default, the history is gathered and activated for the following assets:
 * **User deleted** (permanently): all history entries for deleted user **~~are deleted~~ stay** to provide a full
   asset-user history (deleted users are shown as *User deleted*)
 
-> **Note:**
+> [!NOTE]
 > ~~When an asset or a user gets **permanently** deleted, all history depending on the deleted item is deleted too.~~
 > ~~This is done because from our point of view, history for a deleted user or asset is no longer in anyone's
 interest.~~
@@ -71,8 +71,8 @@ interest.~~
    first)
 3. The new folder inside of `plugins` must be named `assetuserhistory`
 
-   > [!IMPORTANT]
-   > Before installing the plugin, make sure the GLPI database user can manage (create/update/execute/drop) triggers!
+> [!IMPORTANT]
+> Before installing the plugin, make sure the GLPI database user can manage (create/update/execute/drop) triggers!
 
 4. Log into GLPI with a super-admin account and install the plugin
 5. Activate the plugin after installation
