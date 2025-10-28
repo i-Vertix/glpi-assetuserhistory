@@ -26,10 +26,9 @@ By default, the history is gathered and activated for the following assets:
 * **Phones**
 
 > [!NOTE]
-> We did not yet have time to verify the possibility to integrate the new *Custom assets* introduced in GLPI 11.
-> Please open an issue to let us know your interest in having the history also for custom assets.
+> Custom asset support is coming in upcoming version **1.2.1**!
 >
-> You can also try to test custom assets for yourself by injecting custom asset types into the plugin (see below).
+> Since we removed the hardcoded support for simcard assets (external plugin), we want to bring it back with the custom-asset support!
 
 ### 🆕 Changes and new features in 1.2.0 (for GLPI 11)
 
@@ -73,6 +72,8 @@ interest.~~
 
 > [!IMPORTANT]
 > Before installing the plugin, make sure the GLPI database user can manage (create/update/execute/drop) triggers!
+>
+> When using MySQL instead of MariaDB you must enable `log_bin_trust_function_creators` to allow the creation of triggers.
 
 4. Log into GLPI with a super-admin account and install the plugin
 5. Activate the plugin after installation
