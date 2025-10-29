@@ -30,82 +30,15 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Assetuserhistory\History;
-use GlpiPlugin\Assetuserhistory\Config as Plugin_Config;
+use GlpiPlugin\Assetuserhistory\Config;
 
-/**
- * Plugin install process
- *
- * @return boolean
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_install(): bool
-{
-    global $DB;
+header("Content-Type: application/json; charset=UTF-8");
+Html::header_nocache();
 
-    $migration = new Migration(PLUGIN_ASSETUSERHISTORY_VERSION);
+Session::checkLoginUser();
 
-    Plugin_Config::install();
-    $injections = Plugin_Config::getInjectionItemtypes();
-    History::install($migration, $injections);
+Session::checkRight('config', UPDATE);
 
-    $migration->executeMigration();
+$count = Config::registerAllItemtypes();
 
-    return true;
-}
-
-/**
- * Plugin uninstall process
- *
- * @return boolean
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_uninstall(): bool
-{
-    $migration = new Migration(PLUGIN_ASSETUSERHISTORY_VERSION);
-
-    Plugin_Config::uninstall();
-    History::uninstall($migration);
-
-    $migration->executeMigration();
-
-    return true;
-}
-
-/**
- * @param CommonDBTM $item
- * @return void
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_item_purge_asset(CommonDBTM $item): void
-{
-    // delete history when an asset gets deleted
-    $history = new History();
-    $history->deleteByCriteria([
-        "itemtype" => $item::getType(),
-        "items_id" => $item->getID(),
-    ], true);
-}
-
-/**
- * @param User $item
- * @return void
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_item_purge_user(User $item): void
-{
-    global $DB;
-
-    // keep users with id 0 instead of deleting them
-    $DB->update(
-        History::getTable(),
-        [
-            "users_id" => 0,
-        ],
-        [
-            "WHERE" => [
-                "users_id" => $item->getID(),
-            ]
-        ]
-    );
-}
+echo $count . " itemtypes registered";

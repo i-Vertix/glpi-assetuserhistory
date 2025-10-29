@@ -1,5 +1,4 @@
 <?php
-
 /**
  * -------------------------------------------------------------------------
  * Asset-User History plugin for GLPI
@@ -40,6 +39,7 @@ use CommonGLPI;
 use DBConnection;
 use DBmysql;
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\Asset\AssetDefinition;
 use Glpi\DBAL\QueryExpression;
 use Glpi\DBAL\QuerySubQuery;
 use Html;
@@ -47,6 +47,7 @@ use Migration;
 use ProfileRight;
 use Session;
 use User;
+use Glpi\Asset\Asset;
 
 class History extends CommonDBTM
 {
@@ -72,8 +73,6 @@ class History extends CommonDBTM
         $default_key_sign = DBConnection::getDefaultPrimaryKeySignOption();
 
         $table = self::getTable();
-
-        self::uninstallTriggers();
 
         // rename table
         $migration->renameTable("glpi_plugin_assetuserhistory_history", $table);
@@ -115,8 +114,7 @@ class History extends CommonDBTM
         $migration->addRight(self::$rightname, 0, []);
 
         // set default permissions based on asset/user if rights are new
-        if ($setDefaultRights) {
-            $injections = array_values(array_filter($injections, static fn($i) => $i !== "User"));
+        if ($setDefaultRights && !empty($injections)) {
             $requiredRights = array_fill_keys(array_map(static fn($i) => $i::$rightname ?? "", $injections), READ);
             if (!empty($requiredRights)) {
                 $migration->giveRight(
@@ -132,70 +130,18 @@ class History extends CommonDBTM
             );
         }
 
-        return true;
-    }
-
-    /**
-     * @param string $itemtype
-     * @return bool
-     */
-    public static function installTrigger(string $itemtype): bool
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $default_charset = DBConnection::getDefaultCharset();
-        $default_collation = DBConnection::getDefaultCollation();
-
-        $table = self::getTable();
-        $itemTable = getTableForItemType($itemtype);
-        if (empty($itemTable) || !$DB->tableExists($itemTable)) return false;
-
-        $name = strtolower($itemtype);
-
-        $query = <<<SQL
-            create or replace trigger `plugin_assetuserhistory_{$name}_add`
-                after insert
-                on `{$itemTable}`
-                for each row
-            begin
-                DECLARE aType varchar(255) CHARACTER SET {$default_charset} COLLATE {$default_collation};
-                SET aType = '{$itemtype}';
-                if (NEW.users_id <> 0 and NEW.users_id is not null and NEW.users_id is not null) then
-                    insert into {$table} (users_id, items_id, itemtype, assigned)
-                    values (NEW.users_id, NEW.id, aType, NOW());
-                end if;
-            end;
-        SQL;
-        $DB->doQuery($query);
-
-        $query = <<<SQL
-            create or replace trigger plugin_assetuserhistory_{$name}_update
-                after update
-                on `{$itemTable}`
-                for each row
-            begin
-                DECLARE aType varchar(255) CHARACTER SET {$default_charset} COLLATE {$default_collation};
-                SET aType = '{$itemtype}';
-                if (NEW.users_id <> OLD.users_id) then
-                
-                    update {$table}
-                    set revoked = NOW()
-                    where users_id = OLD.users_id
-                    and items_id = NEW.id
-                    and itemtype = itemtype
-                    and revoked is null;
-            
-                    if (NEW.users_id <> 0) then
-                        insert into {$table} (users_id, items_id, itemtype, assigned)
-                        values (NEW.users_id, NEW.id, aType, NOW());
-                    end if;
-                end if;
-            end;
-        SQL;
-        $DB->doQuery($query);
-
-        Session::addMessageAfterRedirect("✅ Enabled user-history for " . $itemtype);
+        // import
+        foreach ($injections as $injection) {
+            $isEmpty = (int)($DB->request([
+                    "COUNT" => "cnt",
+                    "FROM" => self::getTable(),
+                    "WHERE" => [
+                        "itemtype" => $injection,
+                    ]
+                ])->current()["cnt"] ?? 0) === 0;
+            // import if no history for itemtype
+            if ($isEmpty) self::importCurrent($injection);
+        }
 
         return true;
     }
@@ -214,34 +160,75 @@ class History extends CommonDBTM
         $table = self::getTable();
         $itemTable = getTableForItemType($itemtype);
 
-        $DB->insert(self::getTable(), new QuerySubQuery(
-            [
-                "SELECT" => [
-                    new QueryExpression('null', 'id'),
-                    "$itemTable.users_id as users_id",
-                    "$itemTable.id as items_id",
-                    new QueryExpression($DB::quoteValue($itemtype), 'itemtype'),
-                    new QueryExpression('null', 'assigned'),
-                    new QueryExpression('null', 'revoked'),
-                ],
-                "FROM" => $itemTable,
-                "LEFT JOIN" => [
-                    $table => [
-                        "ON" => [
-                            $table => "items_id",
-                            $itemTable => "id",
-                            ["AND" => ["$table.itemtype" => "'$itemtype'"]]
+        if ($itemTable !== Asset::getTable()) {
+            $DB->insert(self::getTable(), new QuerySubQuery(
+                [
+                    "SELECT" => [
+                        new QueryExpression('null', 'id'),
+                        "$itemTable.users_id as users_id",
+                        "$itemTable.id as items_id",
+                        new QueryExpression($DB::quoteValue($itemtype), 'itemtype'),
+                        new QueryExpression('null', 'assigned'),
+                        new QueryExpression('null', 'revoked'),
+                    ],
+                    "FROM" => $itemTable,
+                    "LEFT JOIN" => [
+                        $table => [
+                            "ON" => [
+                                $table => "items_id",
+                                $itemTable => "id",
+                                ["AND" => ["$table.itemtype" => "'$itemtype'"]]
+                            ]
                         ]
+                    ],
+                    "WHERE" => [
+                        "$itemTable.users_id" => ["<>", 0],
+                        "NOT" => ["$itemTable.users_id" => null],
+                        "$itemTable.is_deleted" => 0,
+                        "$table.id" => null
                     ]
-                ],
-                "WHERE" => [
-                    "$itemTable.users_id" => ["<>", 0],
-                    "NOT" => ["$itemTable.users_id" => null],
-                    "$itemTable.is_deleted" => 0,
-                    "$table.id" => null
                 ]
-            ]
-        ));
+            ));
+        } else {
+            $definitionTable = AssetDefinition::getTable();
+            $DB->insert(self::getTable(), new QuerySubQuery(
+                [
+                    "SELECT" => [
+                        new QueryExpression('null', 'id'),
+                        "$itemTable.users_id as users_id",
+                        "$itemTable.id as items_id",
+                        new QueryExpression($DB::quoteValue($itemtype), 'itemtype'),
+                        new QueryExpression('null', 'assigned'),
+                        new QueryExpression('null', 'revoked'),
+                    ],
+                    "FROM" => $itemTable,
+                    "INNER JOIN" => [
+                        $definitionTable => [
+                            "ON" => [
+                                $definitionTable => "id",
+                                $itemTable => "assets_assetdefinitions_id"
+                            ]
+                        ]
+                    ],
+                    "LEFT JOIN" => [
+                        $table => [
+                            "ON" => [
+                                $table => "items_id",
+                                $itemTable => "id",
+                                ["AND" => ["$table.itemtype" => "'$itemtype'"]]
+                            ]
+                        ]
+                    ],
+                    "WHERE" => [
+                        new QueryExpression($DB::quoteValue($itemtype) . " = concat('Glpi\\\\CustomAsset\\\\', $definitionTable.system_name, 'Asset')"),
+                        "$itemTable.users_id" => ["<>", 0],
+                        "NOT" => ["$itemTable.users_id" => null],
+                        "$itemTable.is_deleted" => 0,
+                        "$table.id" => null
+                    ]
+                ]
+            ));
+        }
         return true;
     }
 
@@ -254,38 +241,6 @@ class History extends CommonDBTM
         $table = self::getTable();
         $migration->dropTable($table);
         ProfileRight::deleteProfileRights([self::$rightname]);
-        return true;
-    }
-
-    /**
-     * Uninstall triggers related to plugin from the database.
-     * @return bool
-     */
-    public static function uninstallTriggers(): bool
-    {
-        /** @var DBmysql $DB */
-        global $DB;
-
-        $query = [
-            "SELECT" => ["TRIGGER_NAME"],
-            "FROM" => "information_schema.TRIGGERS",
-            "WHERE" => [
-                "OR" => [
-                    [
-                        "TRIGGER_NAME" => ["LIKE", "plugin_assetuserhistory_%_add"]
-                    ],
-                    [
-                        "TRIGGER_NAME" => ["LIKE", "plugin_assetuserhistory_%_update"]
-                    ],
-                ],
-                "TRIGGER_SCHEMA" => $DB->dbdefault
-            ]
-        ];
-
-        $iterator = $DB->request($query);
-        foreach ($iterator as $res) {
-            $DB->doQuery("DROP TRIGGER IF EXISTS " . $res["TRIGGER_NAME"]);
-        }
         return true;
     }
 

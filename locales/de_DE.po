@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 10:29+0200\n"
-"PO-Revision-Date: 2025-10-22 10:37+0200\n"
+"POT-Creation-Date: 2025-10-29 14:02+0100\n"
+"PO-Revision-Date: 2025-10-29 14:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -18,41 +18,53 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: src/History.php:250
+#: templates/config.html.twig
+msgid "Asset-user history"
+msgstr "Asset-Benutzerverlauf"
+
+#: templates/config.html.twig
+msgid "Enable user history for items"
+msgstr "Benutzerverlauf für Assets aktivieren"
+
+#: templates/repairTriggers.html.twig
+msgid "Collecting asset-user related history is currently broken"
+msgstr "Der Asset-Benutzerverlauf kann aktuell nicht aktualisiert werden"
+
+#: src/Config.php:27 src/Profile.php:28
+msgid "Asset-User history"
+msgstr "Asset-Benutzerverlauf"
+
+#: src/History.php:223
 msgid "View history"
 msgstr "Verlauf ansehen"
 
-#: src/History.php:268
+#: src/History.php:241
 msgid "For asset"
 msgstr "Für Asset"
 
-#: src/History.php:269
+#: src/History.php:242
 msgid "For user"
 msgstr "Für Benutzer"
 
-#: src/History.php:441
+#: src/History.php:414
 msgid "Asset history"
 msgstr "Asset-Verlauf"
 
-#: src/History.php:447
+#: src/History.php:420
 msgid "User history"
 msgstr "Benutzerverlauf"
 
-#: src/History.php:588
+#: src/History.php:561
 msgid "User deleted"
 msgstr "Benutzer gelöscht"
 
-#: src/History.php:616 src/History.php:787
+#: src/History.php:589 src/History.php:760
 msgid "Assigned"
 msgstr "Zugewiesen"
 
-#: src/History.php:620 src/History.php:791
+#: src/History.php:593 src/History.php:764
 msgid "Revoked"
 msgstr "Widerrufen"
-
-#: src/Profile.php:28
-msgid "Asset-User history"
-msgstr "Asset-Benutzerverlauf"
 
 #: src/Profile.php:68
 msgid "View asset-user history"

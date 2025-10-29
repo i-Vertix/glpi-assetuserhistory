@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 10:29+0200\n"
-"PO-Revision-Date: 2025-10-22 10:29+0200\n"
+"POT-Creation-Date: 2025-10-29 14:02+0100\n"
+"PO-Revision-Date: 2025-10-29 14:02+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -17,41 +17,53 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/History.php:250
+#: templates/config.html.twig
+msgid "Asset-user history"
+msgstr "Asset-user history"
+
+#: templates/config.html.twig
+msgid "Enable user history for items"
+msgstr "Enable user history for items"
+
+#: templates/repairTriggers.html.twig
+msgid "Collecting asset-user related history is currently broken"
+msgstr "Collecting asset-user related history is currently broken"
+
+#: src/Config.php:27 src/Profile.php:28
+msgid "Asset-User history"
+msgstr "Asset-User history"
+
+#: src/History.php:223
 msgid "View history"
 msgstr "View history"
 
-#: src/History.php:268
+#: src/History.php:241
 msgid "For asset"
 msgstr "For asset"
 
-#: src/History.php:269
+#: src/History.php:242
 msgid "For user"
 msgstr "For user"
 
-#: src/History.php:441
+#: src/History.php:414
 msgid "Asset history"
 msgstr "Asset history"
 
-#: src/History.php:447
+#: src/History.php:420
 msgid "User history"
 msgstr "User history"
 
-#: src/History.php:588
+#: src/History.php:561
 msgid "User deleted"
 msgstr "User deleted"
 
-#: src/History.php:616 src/History.php:787
+#: src/History.php:589 src/History.php:760
 msgid "Assigned"
 msgstr "Assigned"
 
-#: src/History.php:620 src/History.php:791
+#: src/History.php:593 src/History.php:764
 msgid "Revoked"
 msgstr "Revoked"
-
-#: src/Profile.php:28
-msgid "Asset-User history"
-msgstr "Asset-User history"
 
 #: src/Profile.php:68
 msgid "View asset-user history"

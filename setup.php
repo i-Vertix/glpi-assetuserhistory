@@ -1,5 +1,4 @@
 <?php
-
 /**
  * -------------------------------------------------------------------------
  * Asset-User History plugin for GLPI
@@ -32,49 +31,9 @@
  */
 
 use Glpi\Plugin\Hooks;
+use GlpiPlugin\Assetuserhistory\Config as Plugin_Config;
 
-const PLUGIN_ASSETUSERHISTORY_VERSION = '1.2.0';
-
-/**
- * Retrieve the list of allowed asset user history injections
- *
- * @return array List of asset types for which user history injections are applicable
- * @noinspection PhpUnused
- */
-function plugin_assetuserhistory_injections(): array
-{
-    $default = ['Computer', 'Monitor', 'NetworkEquipment', 'Peripheral', 'Phone', 'Printer'];
-    if (!defined('GLPI_PLUGIN_DOC_DIR')) {
-        return $default;
-    }
-
-    $file = GLPI_PLUGIN_DOC_DIR . '/assetuserhistory/injections.list';
-    if (!is_file($file) || !is_readable($file)) {
-        return $default;
-    }
-
-    $content = trim((string)file_get_contents($file));
-    if ($content === '') {
-        return $default;
-    }
-
-    $injections = array_unique(preg_split('/[\s,]+/', $content, -1, PREG_SPLIT_NO_EMPTY));
-    if (empty($injections)) {
-        return $default;
-    }
-
-    // Always ensure "User" is present and remove duplicates
-    $injections = array_filter($injections, static fn($i) => $i !== 'User');
-
-    // Validate all classes exist
-    foreach ($injections as $class) {
-        if (!class_exists($class) || !(new $class) instanceof CommonDBTM) {
-            return $default;
-        }
-    }
-
-    return array_values($injections);
-}
+const PLUGIN_ASSETUSERHISTORY_VERSION = '1.2.1';
 
 /**
  * Init hooks of the plugin.
@@ -98,7 +57,7 @@ function plugin_init_assetuserhistory(): void
 
     $plugin = new Plugin();
 
-    $injections = plugin_assetuserhistory_injections();
+    $injections = Plugin_Config::getInjectionItemtypes();
     if (Session::getLoginUserID() && $plugin->isActivated('assetuserhistory')) {
         if (Session::haveRight(GlpiPlugin\Assetuserhistory\History::$rightname, GlpiPlugin\Assetuserhistory\History::VIEW_USER_HISTORY)) {
             $plugin::registerClass(GlpiPlugin\Assetuserhistory\History::class, [
@@ -115,6 +74,24 @@ function plugin_init_assetuserhistory(): void
     // PROFILE (ACL)
     Plugin::registerClass(GlpiPlugin\Assetuserhistory\Profile::class, ['addtabon' => [Profile::class]]);
 
+    // CONFIG
+    Plugin::registerClass(GlpiPlugin\Assetuserhistory\Config::class, [
+        'addtabon' => ['Config'],
+    ]);
+    $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['assetuserhistory'] = '../../front/config.form.php?forcetab=GlpiPlugin\Assetuserhistory\Config$1';
+    $PLUGIN_HOOKS[Hooks::PRE_ITEM_UPDATE]['assetuserhistory'] = [
+        Config::class => [
+            GlpiPlugin\Assetuserhistory\Config::class,
+            'prepareConfigUpdate',
+        ],
+    ];
+    $PLUGIN_HOOKS[Hooks::ITEM_UPDATE]['assetuserhistory'] = [
+        Config::class => [
+            GlpiPlugin\Assetuserhistory\Config::class,
+            'registerAllItemtypes',
+        ],
+    ];
+
     // FIRE ON DELETE FUNCTION (PERMANENTLY) TO DELETE HISTORY WHEN ITEM OF INJECTED TYPES IS DELETED
     $purgeActions = [
         User::class => "plugin_assetuserhistory_item_purge_user"
@@ -123,6 +100,7 @@ function plugin_init_assetuserhistory(): void
         $purgeActions[$injection] = "plugin_assetuserhistory_item_purge_asset";
     }
     $PLUGIN_HOOKS[Hooks::ITEM_PURGE]['assetuserhistory'] = $purgeActions;
+    $PLUGIN_HOOKS[Hooks::POST_INIT]['assetuserhistory'] = "plugin_assetuserhistory_post_init";
 }
 
 
