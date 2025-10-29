@@ -26,9 +26,8 @@ By default, the history is gathered and activated for the following assets:
 * **Phones**
 
 > [!NOTE]
-> Custom asset support is coming in upcoming version **1.2.1**!
->
-> Since we removed the hardcoded support for simcard assets (external plugin), we want to bring it back with the custom-asset support!
+> Since version `1.2.1` it is possible to configure, for which assets the asset-user history is enabled.
+> The new config tab is located in `Setup > General`.
 
 ### 🆕 Changes and new features in 1.2.0 (for GLPI 11)
 
@@ -41,8 +40,15 @@ By default, the history is gathered and activated for the following assets:
 > profile with *READ* permissions for **any** *Asset*.
 
 - history entry is no longer deleted when a user gets deleted (shows as *User deleted* in asset-user history)
-- added the possibility to inject custom asset types **before** installing the
-  plugin ([see the instructions](#inject-plugin-into-custom-assets))
+- ~~added the possibility to inject custom asset types **before** installing the
+  plugin ([see the instructions](#-changes-and-new-features-in-120-for-glpi-11))~~
+
+### 🆕 Changes and new features in 1.2.1 (for GLPI 11)
+
+- added a new config page to configure for which asset types the asset-user history should be enabled
+
+  > [!NOTE]
+  > Asset-user history can only be enabled for *assignable* assets (also includes assets from custom asset definitions)
 
 ### ♻️ Lifecycle
 
@@ -73,7 +79,8 @@ interest.~~
 > [!IMPORTANT]
 > Before installing the plugin, make sure the GLPI database user can manage (create/update/execute/drop) triggers!
 >
-> When using MySQL instead of MariaDB you must enable `log_bin_trust_function_creators` to allow the creation of triggers.
+> When using MySQL instead of MariaDB you must enable `log_bin_trust_function_creators` to allow the creation of
+> triggers.
 
 4. Log into GLPI with a super-admin account and install the plugin
 5. Activate the plugin after installation
@@ -104,20 +111,6 @@ A new tab called *Asset history* is available in the user form:
 | Monitor1 	 | Monitor  | 2023-05-04 10:00:00 |                     |
 | PC1      	 | Computer | 2023-05-04 18:00:00 |                     |
 | ...        | ...      | ...                 | ...                 |
-
-## Inject plugin into custom assets
-
-As stated, by default the plugin is enabled for the following asset types: *Computer*, *Monitor*, *NetworkEquipment*,
-*Peripheral*, *Phone*, *Printer*.
-
-Since version `1.2.0` you can manage your own list of supported asset types by creating a file named `injections.list`
-in `<glpi lib directory>/_plugins/assetuserhistory`.
-The file must contain a list of all asset **class names** you want to have enabled (comma or newline separated).
-A template file is present in the plugin directory to get a better understanding of what the file needs to look like.
-
-An asset from a plugin may be injected by giving the complete namespace (GlpiPlugin\Exampleplugin\Myasset) in case of
-plugins using the new file/folder structure (when classes are located in `exampleplugin/src`) or the classname of legacy
-classes (PluginExamplepluginMyasset).
 
 ### 🗿 Troubleshooting
 

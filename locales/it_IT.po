@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-22 10:29+0200\n"
-"PO-Revision-Date: 2025-10-22 10:38+0200\n"
+"POT-Creation-Date: 2025-10-29 14:02+0100\n"
+"PO-Revision-Date: 2025-10-29 14:21+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it_IT\n"
@@ -18,41 +18,53 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: src/History.php:250
+#: templates/config.html.twig
+msgid "Asset-user history"
+msgstr "Storico inventario-utente"
+
+#: templates/config.html.twig
+msgid "Enable user history for items"
+msgstr "Attiva storico inventario-utente"
+
+#: templates/repairTriggers.html.twig
+msgid "Collecting asset-user related history is currently broken"
+msgstr "La raccolta dello storico asset-utente è attualmente interrotta"
+
+#: src/Config.php:27 src/Profile.php:28
+msgid "Asset-User history"
+msgstr "Storico inventario-utente"
+
+#: src/History.php:223
 msgid "View history"
 msgstr "Visualizza cronologia"
 
-#: src/History.php:268
+#: src/History.php:241
 msgid "For asset"
 msgstr "Per inventario"
 
-#: src/History.php:269
+#: src/History.php:242
 msgid "For user"
 msgstr "Per utente"
 
-#: src/History.php:441
+#: src/History.php:414
 msgid "Asset history"
 msgstr "Storico dell' inventario"
 
-#: src/History.php:447
+#: src/History.php:420
 msgid "User history"
 msgstr "Storia dell'utente"
 
-#: src/History.php:588
+#: src/History.php:561
 msgid "User deleted"
 msgstr "Utente eliminato"
 
-#: src/History.php:616 src/History.php:787
+#: src/History.php:589 src/History.php:760
 msgid "Assigned"
 msgstr "Assegnato"
 
-#: src/History.php:620 src/History.php:791
+#: src/History.php:593 src/History.php:764
 msgid "Revoked"
 msgstr "Revocato"
-
-#: src/Profile.php:28
-msgid "Asset-User history"
-msgstr "Storico inventario-utente"
 
 #: src/Profile.php:68
 msgid "View asset-user history"
