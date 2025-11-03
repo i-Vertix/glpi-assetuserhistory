@@ -35,7 +35,10 @@ namespace GlpiPlugin\Assetuserhistory;
 use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
+use Migration;
 use Profile as GlpiProfile;
+use ProfileRight;
+use User;
 
 class Profile extends GlpiProfile
 {
@@ -100,4 +103,52 @@ class Profile extends GlpiProfile
 
         return true;
     }
+
+    /**
+     * @param Migration $migration
+     * @param array $injections
+     * @return void
+     */
+    public static function install(Migration $migration, array $injections): void
+    {
+        global $DB;
+
+        // check if rights are already set
+        $setDefaultRights = (int)($DB->request([
+                "COUNT" => "cnt",
+                "FROM" => ProfileRight::getTable(),
+                "WHERE" => [
+                    "name" => History::$rightname,
+                ]
+            ])->current()["cnt"] ?? 0) === 0;
+
+        // add right where missing (initially without permissions)
+        $migration->addRight(History::$rightname, 0, []);
+
+        // set default permissions based on asset/user if rights are new
+        if ($setDefaultRights && !empty($injections)) {
+            $requiredRights = array_fill_keys(array_map(static fn($i) => $i::$rightname ?? "", $injections), READ);
+            if (!empty($requiredRights)) {
+                $migration->giveRight(
+                    History::$rightname,
+                    History::VIEW_USER_HISTORY,
+                    $requiredRights,
+                );
+            }
+            $migration->giveRight(
+                History::$rightname,
+                History::VIEW_ASSET_HISTORY,
+                [User::$rightname => READ]
+            );
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public static function uninstall(): void
+    {
+        ProfileRight::deleteProfileRights([History::$rightname]);
+    }
+
 }

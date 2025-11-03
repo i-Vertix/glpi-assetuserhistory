@@ -32,6 +32,7 @@
 
 use GlpiPlugin\Assetuserhistory\History;
 use GlpiPlugin\Assetuserhistory\Config as Plugin_Config;
+use GlpiPlugin\Assetuserhistory\Profile as Plugin_Profile;
 
 /**
  * Plugin install process
@@ -47,9 +48,22 @@ function plugin_assetuserhistory_install(): bool
 
     Plugin_Config::install();
     $injections = Plugin_Config::getInjectionItemtypes();
-    History::install($migration, $injections);
-
+    History::install($migration);
+    Plugin_Profile::install($migration, $injections);
     $migration->executeMigration();
+
+    // import
+    foreach ($injections as $injection) {
+        $isEmpty = (int)($DB->request([
+                "COUNT" => "cnt",
+                "FROM" => History::getTable(),
+                "WHERE" => [
+                    "itemtype" => $injection,
+                ]
+            ])->current()["cnt"] ?? 0) === 0;
+        // import if no history for itemtype
+        if ($isEmpty) History::importCurrent($injection);
+    }
 
     return true;
 }
@@ -65,6 +79,7 @@ function plugin_assetuserhistory_uninstall(): bool
     $migration = new Migration(PLUGIN_ASSETUSERHISTORY_VERSION);
 
     Plugin_Config::uninstall();
+    Plugin_Profile::uninstall();
     History::uninstall($migration);
 
     $migration->executeMigration();
