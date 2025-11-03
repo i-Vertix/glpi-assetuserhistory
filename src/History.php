@@ -60,10 +60,9 @@ class History extends CommonDBTM
 
     /**
      * @param Migration $migration
-     * @param string[] $injections
      * @return bool
      */
-    public static function install(Migration $migration, array $injections): bool
+    public static function install(Migration $migration): bool
     {
         /** @var DBmysql $DB */
         global $DB;
@@ -99,48 +98,6 @@ class History extends CommonDBTM
             $migration->changeField($table, "assets_type", "itemtype", "varchar(255) not null");
             $migration->addKey($table, ["items_id", "itemtype"], "item");
             $migration->addKey($table, "users_id", "users_id");
-        }
-
-        // check if rights are already set
-        $setDefaultRights = (int)($DB->request([
-                "COUNT" => "cnt",
-                "FROM" => ProfileRight::getTable(),
-                "WHERE" => [
-                    "name" => self::$rightname,
-                ]
-            ])->current()["cnt"] ?? 0) === 0;
-
-        // add right where missing (initially without permissions)
-        $migration->addRight(self::$rightname, 0, []);
-
-        // set default permissions based on asset/user if rights are new
-        if ($setDefaultRights && !empty($injections)) {
-            $requiredRights = array_fill_keys(array_map(static fn($i) => $i::$rightname ?? "", $injections), READ);
-            if (!empty($requiredRights)) {
-                $migration->giveRight(
-                    self::$rightname,
-                    self::VIEW_USER_HISTORY,
-                    $requiredRights,
-                );
-            }
-            $migration->giveRight(
-                self::$rightname,
-                self::VIEW_ASSET_HISTORY,
-                [User::$rightname => READ]
-            );
-        }
-
-        // import
-        foreach ($injections as $injection) {
-            $isEmpty = (int)($DB->request([
-                    "COUNT" => "cnt",
-                    "FROM" => self::getTable(),
-                    "WHERE" => [
-                        "itemtype" => $injection,
-                    ]
-                ])->current()["cnt"] ?? 0) === 0;
-            // import if no history for itemtype
-            if ($isEmpty) self::importCurrent($injection);
         }
 
         return true;
@@ -240,7 +197,6 @@ class History extends CommonDBTM
     {
         $table = self::getTable();
         $migration->dropTable($table);
-        ProfileRight::deleteProfileRights([self::$rightname]);
         return true;
     }
 
