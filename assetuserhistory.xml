@@ -68,6 +68,13 @@
                 https://github.com/i-Vertix/glpi-assetuserhistory/releases/download/1.2.1/glpi-assetuserhistory-1.2.1.tar.gz
             </download_url>
         </version>
+        <version>
+            <num>1.2.2</num>
+            <compatibility>~11.0</compatibility>
+            <download_url>
+                https://github.com/i-Vertix/glpi-assetuserhistory/releases/download/1.2.2/glpi-assetuserhistory-1.2.2.tar.gz
+            </download_url>
+        </version>
     </versions>
     <langs>
         <lang>en_GB</lang>
