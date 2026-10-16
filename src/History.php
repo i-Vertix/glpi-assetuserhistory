@@ -52,9 +52,9 @@ use Glpi\Asset\Asset;
 class History extends CommonDBTM
 {
 
-    public $no_form_page = true;
-    public $auto_message_on_action = false;
-    public static $rightname = 'plugin_assetuserhistory_history';
+    public bool $no_form_page = true;
+    public bool $auto_message_on_action = false;
+    public static string $rightname = 'plugin_assetuserhistory_history';
     public const VIEW_USER_HISTORY = 1;
     public const VIEW_ASSET_HISTORY = 2;
 
