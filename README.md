@@ -50,6 +50,11 @@ By default, the history is gathered and activated for the following assets:
   > [!NOTE]
   > Asset-user history can only be enabled for *assignable* assets (also includes assets from custom asset definitions)
 
+### 🆕 Changes and new features in 1.3.0 (for GLPI 12)
+
+- added compatibility for GLPI 12
+- broadened the plugin version requirement to allow GLPI `>= 11.0.0` and `< 12.1.0`
+
 ### ♻️ Lifecycle
 
 * *Asset* **created**, *User* **set**: a history entry gets **created**
