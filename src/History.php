@@ -446,15 +446,29 @@ class History extends CommonDBTM
         if (empty($sort)) $sort = "assigned";
         if (empty($order)) $order = "DESC";
 
-        $orderForQuery = $order === "ASC" ? "DESC" : "ASC";
-        $orderBy = new QueryExpression($sort === "assigned"
-            ? sprintf("isnull(%s) %s, -%s %s", $DB::quoteName($sort), $orderForQuery, $DB::quoteName($sort), $orderForQuery)
-            : sprintf("-%s %s", $DB::quoteName($sort), $orderForQuery)
-        );
-
-
         $table = self::getTable();
         $userTable = User::getTable();
+
+        switch ($sort) {
+            default:
+            case "assigned":
+                $orderBy = sprintf(
+                    "isnull(%s) %s, -%s %s",
+                    $DB::quoteName("assigned"),
+                    $order === "ASC" ? "DESC" : "ASC",
+                    $DB::quoteName("assigned"),
+                    $order === "ASC" ? "DESC" : "ASC"
+                );
+                break;
+            case "revoked":
+                $orderBy = sprintf("-%s %s", $DB::quoteName($sort), $order === "ASC" ? "DESC" : "ASC");
+                break;
+            case "user":
+                $orderBy = sprintf("%s %s", $userTable . "." . $DB::quoteName("name"), $order === "ASC" ? "ASC" : "DESC");
+                break;
+        }
+        $orderBy = new QueryExpression($orderBy);
+
         $query = [
             "SELECT" => [
                 "$table.users_id",
@@ -507,14 +521,14 @@ class History extends CommonDBTM
                     // build user links
                     foreach ($indexesByUserIds[$userId] ?? [] as $index) {
                         if ($canView) {
-                            $results[$index]["href"] = User::getFormURLWithID($user->getID());
+                            $results[$index]["href"] = htmlescape(User::getFormURLWithID($user->getID()));
                         } else {
                             unset($results[$index]);
                         }
                     }
                     if (!$canView) continue;
                     // build the user-options array
-                    $userOptions[(string)$user->getID()] = $user->getField("name");
+                    $userOptions[(string)$user->getID()] = htmlescape($user->getField("name"));
                     // add to navigate stack
                     Session::addToNavigateListItems(User::getType(), $user->getID());
                 }
@@ -541,15 +555,21 @@ class History extends CommonDBTM
         $results = array_splice($results, $start, $list_limit);
 
         foreach ($results as &$res) {
-            if (isset($res["href"])) {
-                $res["user"] = '<a href="' . $res["href"] . '">' . $res["users_name"] . '</a>';
-            } else if (empty($res["users_name"])) {
-                $res["user"] = '<i>' . __('User deleted', 'assetuserhistory') . '</i>';
+            if (empty($res["users_name"])) {
+                $res["user"] = '<i>' . htmlescape(__('User deleted', 'assetuserhistory')) . '</i>';
             } else {
-                $res["user"] = $res["users_name"];
+                $name = htmlescape($res["users_name"]);
+                if ($_SESSION["glpiis_ids_visible"]) {
+                    $name = sprintf(__s('%1$s (%2$s)'), $name, (int)$res["users_id"]);
+                }
+                if (isset($res["href"])) {
+                    $res["user"] = '<a href="' . htmlescape($res["href"]) . '">' . $name . '</a>';
+                } else {
+                    $res["user"] = $name;
+                }
             }
-            $res["assigned"] = $res["assigned"] ? Html::convDateTime($res["assigned"], null, true) : "?";
-            $res["revoked"] = Html::convDateTime($res["revoked"], null, true);
+            $res["assigned"] = htmlescape($res["assigned"] ? Html::convDateTime($res["assigned"], null, true) : "?");
+            $res["revoked"] = htmlescape(Html::convDateTime($res["revoked"], null, true));
             unset($res["users_name"], $res["href"]);
         }
         unset($res);
@@ -624,11 +644,26 @@ class History extends CommonDBTM
         if (empty($sort)) $sort = "assigned";
         if (empty($order)) $order = "DESC";
 
-        $orderForQuery = $order === "ASC" ? "DESC" : "ASC";
-        $orderBy = new QueryExpression($sort === "assigned"
-            ? sprintf("isnull(%s) %s, -%s %s", $DB::quoteName($sort), $orderForQuery, $DB::quoteName($sort), $orderForQuery)
-            : sprintf("-%s %s", $DB::quoteName($sort), $orderForQuery)
-        );
+        switch ($sort) {
+            default:
+            case "assigned":
+            case "items_name":
+                $orderBy = sprintf(
+                    "isnull(%s) %s, -%s %s",
+                    $DB::quoteName("assigned"),
+                    $order === "ASC" ? "DESC" : "ASC",
+                    $DB::quoteName("assigned"),
+                    $order === "ASC" ? "DESC" : "ASC"
+                );
+                break;
+            case "revoked":
+                $orderBy = sprintf("-%s %s", $DB::quoteName($sort), $order === "ASC" ? "DESC" : "ASC");
+                break;
+            case "itemtype":
+                $orderBy = sprintf("%s %s", $DB::quoteName($sort), $order === "ASC" ? "ASC" : "DESC");
+                break;
+        }
+        $orderBy = new QueryExpression($orderBy);
 
         $table = self::getTable();
         $query = [
@@ -670,7 +705,7 @@ class History extends CommonDBTM
                 $itemIds = array_keys($indexesByIds);
                 $obj = new $model;
 
-                $itemtypeOptions[$itemtype] = $model::getTypeName(1);
+                $itemtypeOptions[$itemtype] = htmlescape($model::getTypeName(1));
 
                 // GET EXISTING ASSETS BY IDS
                 $items = array_map(static function ($i) use ($model) {
@@ -708,12 +743,34 @@ class History extends CommonDBTM
             }
         }
 
+        if ($sort === "items_name") {
+            usort($results, static function ($a, $b) use ($order) {
+                if ($order === "ASC") {
+                    return strnatcasecmp($a["items_name"], $b["items_name"]);
+                } else {
+                    return strnatcasecmp($b["items_name"], $a["items_name"]);
+                }
+            });
+        }
+
         foreach ($results as &$res) {
             $model = getItemForItemtype($res["itemtype"]);
-            $res["itemtype"] = $model::getTypeName(1);
-            $res["items_name"] = '<a href="' . $model::getFormURLWithID($res["items_id"]) . '">' . $res["items_name"] . '</a>';
-            $res["assigned"] = $res["assigned"] ? Html::convDateTime($res["assigned"], null, true) : "?";
-            $res["revoked"] = Html::convDateTime($res["revoked"], null, true);
+            $res["itemtype"] = htmlescape($model::getTypeName(1));
+
+            $name = htmlescape($res["items_name"]);
+            if (
+                $_SESSION["glpiis_ids_visible"]
+                || empty($res["items_name"])
+            ) {
+                $name = sprintf(__s('%1$s (%2$s)'), $name, (int)$res["items_id"]);
+            }
+            if ($model::canView()) {
+                $name = '<a href="' . htmlescape($model::getFormURLWithID($res["items_id"])) . '">' . $name . '</a>';
+            }
+            $res["items_name"] = $name;
+
+            $res["assigned"] = htmlescape($res["assigned"] ? Html::convDateTime($res["assigned"], null, true) : "?");
+            $res["revoked"] = htmlescape(Html::convDateTime($res["revoked"], null, true));
             Session::addToNavigateListItems($model::getType(), $res["items_id"]);
         }
         unset($res);

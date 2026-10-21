@@ -29,32 +29,6 @@ By default, the history is gathered and activated for the following assets:
 > Since version `1.2.1` it is possible to configure, for which assets the asset-user history is enabled.
 > The new config tab is located in `Setup > General`.
 
-### 🆕 Changes and new features in 1.2.0 (for GLPI 11)
-
-- added a new profile right to view asset-user and/or user-asset history
-
-> [!NOTE]
-> During the installation of version `1.2.0`, the right to view the asset history (in user) is automatically set to
-> every profile
-> with *READ* permissions for *User*. The right to view the user history (in asset) is automatically set to every
-> profile with *READ* permissions for **any** *Asset*.
-
-- history entry is no longer deleted when a user gets deleted (shows as *User deleted* in asset-user history)
-- ~~added the possibility to inject custom asset types **before** installing the
-  plugin ([see the instructions](#-changes-and-new-features-in-120-for-glpi-11))~~
-
-### 🆕 Changes and new features in 1.2.1 (for GLPI 11)
-
-- added a new config page to configure for which asset types the asset-user history should be enabled
-
-  > [!NOTE]
-  > Asset-user history can only be enabled for *assignable* assets (also includes assets from custom asset definitions)
-
-### 🆕 Changes and new features in 1.3.0 (for GLPI 12)
-
-- added compatibility for GLPI 12
-- broadened the plugin version requirement to allow GLPI `>= 11.0.0` and `< 12.1.0`
-
 ### ♻️ Lifecycle
 
 * *Asset* **created**, *User* **set**: a history entry gets **created**
@@ -167,6 +141,38 @@ if you want to restore your current history afterward: `glpi_plugin_assetuserhis
 It's possible that these errors are coming from our beloved triggers, which listen for *INSERT* and *UPDATE* changes on
 all common asset tables and the user table.
 Please verify the triggers created by the plugin using the [instructions above](#no-history-written).
+
+## Changelog
+
+### 🆕 Changes and security fixes in 1.3.1 (for GLPI 12)
+
+- fix sorting for asset & user history table
+- fix display of history table
+
+### 🆕 Changes and new features in 1.3.0 (for GLPI 12)
+
+- added compatibility for GLPI 12
+
+### 🆕 Changes and new features in 1.2.1 (for GLPI 11)
+
+- added a new config page to configure for which asset types the asset-user history should be enabled
+
+> [!NOTE]
+> Asset-user history can only be enabled for *assignable* assets (also includes assets from custom asset definitions)
+
+### 🆕 Changes and new features in 1.2.0 (for GLPI 11)
+
+- added a new profile right to view asset-user and/or user-asset history
+
+> [!NOTE]
+> During the installation of version `1.2.0`, the right to view the asset history (in user) is automatically set to
+> every profile
+> with *READ* permissions for *User*. The right to view the user history (in asset) is automatically set to every
+> profile with *READ* permissions for **any** *Asset*.
+
+- history entry is no longer deleted when a user gets deleted (shows as *User deleted* in asset-user history)
+- ~~added the possibility to inject custom asset types **before** installing the
+  plugin ([see the instructions](#-changes-and-new-features-in-120-for-glpi-11))~~
 
 ## 📢 CONTRIBUTING
 
