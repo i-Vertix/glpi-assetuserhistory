@@ -12,32 +12,33 @@
         </short>
         <long>
             <en>
-                This plugin adds a dedicated history of any asset-user relation change to keep track of whom the asset
-                belonged to.
+    This plugin adds a dedicated history of any asset-user relation change
+    to keep track of whom the asset belonged to.
+    Please have a look at the readme to see the requirements for the plugin
+    to install and work correctly.
 
-                Please have a look at the readme to see the requirements for the plugin to install and work correctly.
-
-                This plugin also supports full-weight assets introduced by other plugins and assets from custom asset
-                definitions!
+    This plugin also supports full-weight assets introduced by other plugins
+    and assets from custom asset definitions!
             </en>
             <de>
-                Dieses Plugin fügt eine eigene Historie für alle Änderungen der Beziehung zwischen Asset und Benutzer
-                hinzu, um nachzuverfolgen, wem das Asset gehört hat.
+    Dieses Plugin fügt eine eigene Historie für alle Änderungen der Beziehung
+    zwischen Asset und Benutzer  hinzu, um nachzuverfolgen, wem das Asset gehört hat.
 
-                Bitte lesen Sie das Readme um mehr über die Voraussetzungen zu erfahren, die das Plugin benötigt um
-                korrekt zu funktionieren.
+    Bitte lesen Sie das Readme um mehr über die Voraussetzungen zu erfahren,
+    die das Plugin benötigt um korrekt zu funktionieren.
 
-                Das Plugin unterstützt seit Kurzem auch Assets, die von Plugins stammen sowie Assets, die von den neuen
-                Custom Assetdefinitionen stammen.
+    Das Plugin unterstützt seit Kurzem auch Assets, die von Plugins stammen sowie
+    Assets, die von den neuen Custom Assetdefinitionen stammen.
             </de>
             <it>
-                Questo plugin aggiunge una cronologia dedicata a tutte le modifiche della relazione tra inventario e
-                utente, per tenere traccia di a chi apparteneva l'inventario.
+    Questo plugin aggiunge una cronologia dedicata a tutte le modifiche della relazione
+    tra inventario e utente, per tenere traccia di a chi apparteneva l'inventario.
 
-                Si prega di leggere il file README per capire quali prerequisiti sono necessari per il plugin.
+    Si prega di leggere il file README per capire quali prerequisiti sono necessari
+    per il plugin.
 
-                Questo plugin supporta anche gli inventari completi introdotti da altri plugin e gli inventari
-                provenienti da definizioni personalizzate!
+    Questo plugin supporta anche gli inventari completi introdotti da altri
+    plugin e gli inventari provenienti da definizioni personalizzate!
             </it>
         </long>
     </description>
@@ -96,6 +97,7 @@
         <lang>en_GB</lang>
         <lang>de_DE</lang>
         <lang>it_IT</lang>
+        <lang>es_MX</lang>
     </langs>
     <license>MIT</license>
     <tags>
@@ -120,7 +122,8 @@
     </tags>
     <screenshots>
         <screenshot>https://github.com/i-Vertix/glpi-assetuserhistory/raw/main/screenshots/user-history.png</screenshot>
-        <screenshot>https://github.com/i-Vertix/glpi-assetuserhistory/raw/main/screenshots/asset-history.png</screenshot>
+        <screenshot>https://github.com/i-Vertix/glpi-assetuserhistory/raw/main/screenshots/asset-history.png
+        </screenshot>
         <screenshot>https://github.com/i-Vertix/glpi-assetuserhistory/raw/main/screenshots/profile.png</screenshot>
     </screenshots>
 </root>
