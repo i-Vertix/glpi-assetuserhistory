@@ -33,7 +33,7 @@
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Assetuserhistory\Config as Plugin_Config;
 
-const PLUGIN_ASSETUSERHISTORY_VERSION = '1.3.0';
+const PLUGIN_ASSETUSERHISTORY_VERSION = '1.3.1';
 
 /**
  * Init hooks of the plugin.
@@ -122,7 +122,7 @@ function plugin_version_assetuserhistory(): array
         'homepage' => 'i-vertix.com',
         'requirements' => [
             'glpi' => [
-                'min' => "11.0.0",
+                'min' => "12.0.0",
                 'max' => "12.0.99",
             ]
         ]
