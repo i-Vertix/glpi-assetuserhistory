@@ -30,7 +30,12 @@
  * -------------------------------------------------------------------------
  */
 
+use Glpi\Exception\Http\BadRequestHttpException;
 use GlpiPlugin\Assetuserhistory\Config;
+
+if (($_SERVER['REQUEST_METHOD'] ?? null) !== 'POST') {
+    throw new BadRequestHttpException("method not allowed");
+}
 
 header("Content-Type: application/json; charset=UTF-8");
 Html::header_nocache();
