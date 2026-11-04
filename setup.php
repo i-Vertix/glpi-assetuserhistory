@@ -33,7 +33,7 @@
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Assetuserhistory\Config as Plugin_Config;
 
-const PLUGIN_ASSETUSERHISTORY_VERSION = '1.2.2';
+const PLUGIN_ASSETUSERHISTORY_VERSION = '1.2.3';
 
 /**
  * Init hooks of the plugin.

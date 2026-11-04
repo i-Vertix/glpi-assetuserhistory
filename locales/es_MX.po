@@ -1,0 +1,70 @@
+# Spanish (Mexico) translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: es_MXv1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-29 14:02+0100\n"
+"PO-Revision-Date: 2026-01-27 07:40-0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: es_MX\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/config.html.twig
+msgid "Asset-user history"
+msgstr "Historial de usuario de activos"
+
+#: templates/config.html.twig
+msgid "Enable user history for items"
+msgstr "Habilitar historial de usuario por activos"
+
+#: templates/repairTriggers.html.twig
+msgid "Collecting asset-user related history is currently broken"
+msgstr "La recopilación del historial relacionado con los usuarios de los activos no funciona actualmente"
+
+#: src/Config.php:27 src/Profile.php:28
+msgid "Asset-User history"
+msgstr "Historial de usuario de activos"
+
+#: src/History.php:223
+msgid "View history"
+msgstr "Ver historial"
+
+#: src/History.php:241
+msgid "For asset"
+msgstr "Por activo"
+
+#: src/History.php:242
+msgid "For user"
+msgstr "Por usuario"
+
+#: src/History.php:414
+msgid "Asset history"
+msgstr "Historial de activos"
+
+#: src/History.php:420
+msgid "User history"
+msgstr "Historial de usuario"
+
+#: src/History.php:561
+msgid "User deleted"
+msgstr "Usuario eliminado"
+
+#: src/History.php:589 src/History.php:760
+msgid "Assigned"
+msgstr "Asignado"
+
+#: src/History.php:593 src/History.php:764
+msgid "Revoked"
+msgstr "Revocado"
+
+#: src/Profile.php:68
+msgid "View asset-user history"
+msgstr "Ver historial de activos del usuario"
