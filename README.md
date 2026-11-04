@@ -153,6 +153,15 @@ Please verify the triggers created by the plugin using the [instructions above](
 
 - added compatibility for GLPI 12
 
+### 🆕 Changes and security fixes in 1.2.3 (for GLPI 11)
+
+- fix sorting for asset & user history table
+- fix display of history table
+
+### 🆕 Changes and new features in 1.2.2 (for GLPI 11)
+
+- fix migration from 1.1.0
+
 ### 🆕 Changes and new features in 1.2.1 (for GLPI 11)
 
 - added a new config page to configure for which asset types the asset-user history should be enabled
